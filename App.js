@@ -10,6 +10,7 @@ import React from 'react';
 import {
   Platform, StyleSheet, Text, View,
 } from 'react-native';
+import MyModal from './components/MyModal';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\nCmd+D or shake for dev menu',
@@ -40,12 +41,22 @@ const styles = StyleSheet.create({
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      board: [],
+      user: '',
+      modalVisible: false,
+    };
   }
 
+  componentDidMount() {
+  }
+
+
   render() {
+    const { modalVisible } = this.state;
     return (
       <View style={styles.container}>
+        
         <Text style={styles.welcome}>Welcome to React Native!</Text>
         <Text style={styles.instructions}>To get started, edit App.js</Text>
         <Text style={styles.instructions}>{instructions}</Text>
