@@ -10,9 +10,9 @@ import React from 'react';
 import {
   Platform, StyleSheet, Text, View,
 } from 'react-native';
-import FontAwesome, { Icons, IconTypes } from 'react-native-fontawesome';
 import MyModal from './components/MyModal';
 import Board from './components/Board';
+import FontAwesome, { Icons } from 'react-native-fontawesome';
 
 
 const instructions = Platform.select({
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    backgroundColor: 'aqua',
+    backgroundColor: 'slategray',
   },
   board: {
     flex: 6,
@@ -42,26 +42,89 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'brown',
   },
+  titleWords: {
+    fontFamily: 'FontAwesome',
+    fontSize: 45,
+    margin: 10,
+    textAlign: 'center',
+    color: 'silver',
+  },
 });
+
+const checkHelper = (board, row, col) => {
+  for (let i = Math.max(0, row - 1); i < Math.min(10, row + 2); i++) {
+    for (let j = Math.max(0, col - 1); j < Math.min(10, col + 2); j++) {
+      if (i === row && j === col) {
+        continue;
+      } else if (board[i][j] === 1) {
+        board[i][j] -= 9;
+        checkHelper(board, i, j);
+      }
+    }
+  }
+};
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      board: [],
+      board: Array.from({ length: 100 }, () => 1),
       user: '',
       modalVisible: false,
+      mines: 10,
+      size: 10,
+      gameOver: false,
     };
-    this.resetBoard = this.resetBoard.bind(this);
+    this.check = this.check.bind(this);
   }
 
   componentDidMount() {
     this.resetBoard();
   }
 
+  getBoard() {
+    const { mines, size } = this.state;
+    let count = 0;
+    const newBoard = Array.from({ length: size * size }, () => 1);
+    while (count < mines) {
+      const row = Math.floor(Math.random() * size);
+      const col = Math.floor(Math.random() * size);
+      if (newBoard[(row * size) + col] !== -9) {
+        newBoard[(row * size) + col] = -9;
+        count += 1;
+        for (let i = Math.max(0, row - 1); i < Math.min(size, row + 2); i++) {
+          for (let j = Math.max(0, col - 1); j < Math.min(size, col + 2); j++) {
+            if (newBoard[(i * size) + j] !== -9) {
+              newBoard[(i * size) + j] += 1;
+            }
+          }
+        }
+      }
+    }
+    return newBoard;
+  }
+
   resetBoard() {
     this.setState({
-      board: Array.from({ length: 3 }, () => Array.from({ length: 3 }, () => 0)),
+      board: this.getBoard(),
+    });
+  }
+
+  check(row, col) {
+    const { board, size } = this.state;
+    let newValue = board[(row * size) + col];
+    if (newValue === -9) {
+      newValue -= 2;
+    } else {
+      newValue -= 9;
+    }
+    const newBoard = Array.from(board);
+    newBoard[(row * size) + col] = newValue;
+    if (newValue === -8) {
+      checkHelper(newBoard, row, col);
+    }
+    this.setState({
+      board: newBoard,
     });
   }
 
@@ -70,14 +133,13 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.title}>
-          <Text style={{margin: 10, fontSize: 32, textAlign: 'left'}}>
-            <FontAwesome>{Icons.chevronLeft}</FontAwesome>
-            Minesweeper
-          </Text>
+          <Text style={styles.titleWords}>MINE &#xf1e2; SWEEPER</Text>
         </View>
-        <View style={styles.board} />
+        <Board board={board} onPress={this.check} />
         <View style={styles.buttons} />
-        <View style={styles.scoreboard} />
+        <View style={styles.scoreboard} >
+          <Text><FontAwesome>{Icons.bomb}</FontAwesome></Text>
+        </View>
       </View>
     );
   }

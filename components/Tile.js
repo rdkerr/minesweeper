@@ -1,24 +1,67 @@
 import React from 'react';
 import {
-  View, Text, StyleSheet,
+  View, Text, StyleSheet, Button, Alert,
 } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'powderblue',
-    width: 40,
-    height: 50,
-    borderColor: '#555555',
-    borderStyle: 'solid',
-    borderWidth: 2,
+    backgroundColor: 'darkgrey',
+    flex: 1,
+    margin: 1,
+    justifyContent: 'center',
+  },
+  text: {
+    fontFamily: 'FontAwesome',
+    fontSize: 20,
+    margin: 10,
+    textAlign: 'center',
+  },
+  greenBomb: {
+    fontFamily: 'FontAwesome',
+    fontSize: 20,
+    margin: 10,
+    textAlign: 'center',
+    color: 'green',
+  },
+  redBomb: {
+    fontFamily: 'FontAwesome',
+    fontSize: 20,
+    margin: 10,
+    textAlign: 'center',
+    color: 'red',
   },
 });
 
+const onPressButton = () => {
+  Alert.alert('You tapped the button!');
+};
+
+const getContents = (value, onPress) => {
+  let result;
+  if (value >= 10 || value === -10) {
+    result = (<Text style={styles.bomb}>&#xf024;</Text>);
+  } else if (value > 0 || value === -9) {
+    result = (<Button
+      color={'rgba(52, 52, 52, 0.8)'}
+      onPress={onPress}
+      title=" "
+    />);
+  } else if (value > -9) {
+    const val = value === -8 ? '' : (value + 8).toString();
+    result = (<Text style={styles.text}>{val}</Text>);
+  } else if (value === -11) {
+    result = (<Text style={styles.redBomb}>&#xf1e2;</Text>);
+  } else if (value === -12) {
+    result = (<Text style={styles.greenBomb}>&#xf1e2;</Text>);
+  }
+  return result;
+};
+
 const Tile = (props) => {
-  const { value } = props;
+  const { value, onPress } = props;
   return (
     <View style={styles.container}>
-      <Text>{value}</Text>
+      {getContents(value, onPress)}
     </View>
   );
 };

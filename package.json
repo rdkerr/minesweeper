@@ -5,12 +5,16 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest",
-    "android-windows": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && react-native run-android"
+    "android-windows": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && react-native run-android",
+    "clean": "react-native-clean-project"
   },
   "dependencies": {
+    "jest-haste-map": "^24.5.0",
+    "jest-resolve": "^24.5.0",
     "react": "16.8.3",
     "react-native": "0.59.1",
-    "react-native-fontawesome": "^6.0.1"
+    "react-native-fontawesome": "^6.0.1",
+    "react-native-vector-icons": "^6.4.1"
   },
   "devDependencies": {
     "@babel/core": "7.3.4",
@@ -23,9 +27,15 @@
     "eslint-plugin-react": "^7.12.4",
     "jest": "24.5.0",
     "metro-react-native-babel-preset": "0.53.1",
+    "react-native-clean-project": "^3.0.1",
     "react-test-renderer": "16.8.3"
   },
   "jest": {
     "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts/"
+    ]
   }
 }
