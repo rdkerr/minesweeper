@@ -36,7 +36,7 @@ const onPressButton = () => {
   Alert.alert('You tapped the button!');
 };
 
-const getContents = (value, onPress) => {
+const getContents = (value, onPress, onLongPress) => {
   let result;
   if (value >= 10 || value === -10) {
     result = (<Text style={styles.bomb}>&#xf024;</Text>);
@@ -44,6 +44,7 @@ const getContents = (value, onPress) => {
     result = (<Button
       color={'rgba(52, 52, 52, 0.8)'}
       onPress={onPress}
+      onLongPress={onLongPress}
       title=" "
     />);
   } else if (value > -9) {
@@ -58,10 +59,10 @@ const getContents = (value, onPress) => {
 };
 
 const Tile = (props) => {
-  const { value, onPress } = props;
+  const { value, onPress, onLongPress } = props;
   return (
     <View style={styles.container}>
-      {getContents(value, onPress)}
+      {getContents(value, onPress, onLongPress)}
     </View>
   );
 };

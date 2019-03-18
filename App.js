@@ -8,19 +8,10 @@
 
 import React from 'react';
 import {
-  Platform, StyleSheet, Text, View,
+  StyleSheet, Text, View,
 } from 'react-native';
-import MyModal from './components/MyModal';
-import Board from './components/Board';
 import FontAwesome, { Icons } from 'react-native-fontawesome';
-
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\nCmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n'
-    + 'Shake or press menu button for dev menu',
-});
+import Board from './components/Board';
 
 const styles = StyleSheet.create({
   container: {
@@ -54,10 +45,9 @@ const styles = StyleSheet.create({
 const checkHelper = (board, row, col) => {
   for (let i = Math.max(0, row - 1); i < Math.min(10, row + 2); i++) {
     for (let j = Math.max(0, col - 1); j < Math.min(10, col + 2); j++) {
-      if (i === row && j === col) {
-        continue;
-      } else if (board[i][j] === 1) {
-        board[i][j] -= 9;
+      if (board[(i * 10) + j] === 1) {
+        // eslint-disable-next-line no-param-reassign
+        board[(i * 10) + j] -= 9;
         checkHelper(board, i, j);
       }
     }
@@ -69,13 +59,11 @@ export default class App extends React.Component {
     super(props);
     this.state = {
       board: Array.from({ length: 100 }, () => 1),
-      user: '',
-      modalVisible: false,
       mines: 10,
       size: 10,
-      gameOver: false,
     };
     this.check = this.check.bind(this);
+    this.toggleFlag = this.toggleFlag.bind(this);
   }
 
   componentDidMount() {
@@ -128,16 +116,21 @@ export default class App extends React.Component {
     });
   }
 
+  toggleFlag(row, col) {
+    const { board } = this.state;
+    console.warn('Toggle', row, col);
+  }
+
   render() {
-    const { modalVisible, board } = this.state;
+    const { board } = this.state;
     return (
       <View style={styles.container}>
         <View style={styles.title}>
           <Text style={styles.titleWords}>MINE &#xf1e2; SWEEPER</Text>
         </View>
-        <Board board={board} onPress={this.check} />
+        <Board board={board} onPress={this.check} onLongPress={this.toggleFlag} />
         <View style={styles.buttons} />
-        <View style={styles.scoreboard} >
+        <View style={styles.scoreboard}>
           <Text><FontAwesome>{Icons.bomb}</FontAwesome></Text>
         </View>
       </View>

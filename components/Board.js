@@ -22,12 +22,12 @@ const indexes = [
 ];
 
 const Board = (props) => {
-  const { board, onPress } = props;
+  const { board, onPress, onLongPress } = props;
   return (
     <View style={styles.container}>
       {indexes.map((_, i) => (
         <View style={styles.row} key={`row-${i}`}>
-          {indexes.map((__, j) => <Tile value={board[(i * 10) + j]} onPress={() => onPress(i, j)} key={`${i}-${j}`} />)}
+          {indexes.map((__, j) => <Tile value={board[(i * 10) + j]} onPress={() => onPress(i, j)} onLongPress={() => onLongPress(i, j)} key={`${i}-${j}`} />)}
         </View>
       ))}
     </View>
