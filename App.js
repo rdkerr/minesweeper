@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
 const checkHelper = (board, row, col) => {
   for (let i = Math.max(0, row - 1); i < Math.min(10, row + 2); i++) {
     for (let j = Math.max(0, col - 1); j < Math.min(10, col + 2); j++) {
-      if (board[(i * 10) + j] === 1) {
+      if (board[(i * 10) + j] === 1 || board[(i * 10) + j] === 2) {
         // eslint-disable-next-line no-param-reassign
         board[(i * 10) + j] -= 9;
         checkHelper(board, i, j);
@@ -61,6 +61,7 @@ export default class App extends React.Component {
       board: Array.from({ length: 100 }, () => 1),
       mines: 10,
       size: 10,
+      remaining: 100,
     };
     this.check = this.check.bind(this);
     this.toggleFlag = this.toggleFlag.bind(this);
@@ -111,18 +112,43 @@ export default class App extends React.Component {
     if (newValue === -8) {
       checkHelper(newBoard, row, col);
     }
-    this.setState({
-      board: newBoard,
-    });
+    const rem = newBoard.reduce((res, el) => (el > 0 ? res + 1 : res), 0);
+    this.setState({ board: newBoard, remaining: rem });
+    if (rem === 0) {
+      this.reveal();
+    }
   }
 
   toggleFlag(row, col) {
+    const { board, size, remaining } = this.state;
+    let value = board[(row * size) + col];
+    if (value > 9) {
+      value -= 9;
+    } else if (value > 0) {
+      value += 9;
+    } else {
+      value = value === -9 ? -10 : -9;
+    }
+    const newBoard = Array.from(board);
+    newBoard[(row * size) + col] = value;
+    this.setState({ board: newBoard });
+    console.warn(remaining);
+  }
+
+  reveal() {
     const { board } = this.state;
-    console.warn('Toggle', row, col);
+    const newBoard = Array.from(board);
+    for (let i = 0; i < newBoard.length; i++) {
+      if (newBoard[i] === -9 || newBoard[i] === -10) {
+        newBoard[i] = -12;
+      }
+    }
+    this.setState({ board: newBoard });
   }
 
   render() {
-    const { board } = this.state;
+    const { board, remaining } = this.state;
+    console.warn(remaining);
     return (
       <View style={styles.container}>
         <View style={styles.title}>

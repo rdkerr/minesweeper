@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  View, Text, StyleSheet, Button, Alert,
+  View, Text, StyleSheet, Button, TouchableHighlight,
 } from 'react-native';
 
 const styles = StyleSheet.create({
@@ -32,21 +32,24 @@ const styles = StyleSheet.create({
   },
 });
 
-const onPressButton = () => {
-  Alert.alert('You tapped the button!');
-};
-
 const getContents = (value, onPress, onLongPress) => {
   let result;
   if (value >= 10 || value === -10) {
-    result = (<Text style={styles.bomb}>&#xf024;</Text>);
+    result = (
+      <View style={{ flex: 1, backgroundColor: 'rgba(52, 52, 52, 0.8)' }}>
+        <TouchableHighlight style={{ flex: 1 }} onLongPress={onLongPress}>
+          <Text style={styles.text}>&#xf024;</Text>
+        </TouchableHighlight>
+      </View>
+    );
   } else if (value > 0 || value === -9) {
-    result = (<Button
-      color={'rgba(52, 52, 52, 0.8)'}
-      onPress={onPress}
-      onLongPress={onLongPress}
-      title=" "
-    />);
+    result = (
+      <View style={{ flex: 1, backgroundColor: 'rgba(52, 52, 52, 0.8)' }}>
+        <TouchableHighlight style={{ flex: 1 }} onPress={onPress} onLongPress={onLongPress}>
+          <Text />
+        </TouchableHighlight>
+      </View>
+    );
   } else if (value > -9) {
     const val = value === -8 ? '' : (value + 8).toString();
     result = (<Text style={styles.text}>{val}</Text>);
