@@ -30,6 +30,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'red',
   },
+  flag: {
+    fontFamily: 'FontAwesome',
+    fontSize: 20,
+    margin: 10,
+    textAlign: 'center',
+    color: 'silver',
+  }
 });
 
 const getContents = (value, onPress, onLongPress) => {
@@ -38,7 +45,7 @@ const getContents = (value, onPress, onLongPress) => {
     result = (
       <View style={{ flex: 1, backgroundColor: 'rgba(52, 52, 52, 0.8)' }}>
         <TouchableHighlight style={{ flex: 1 }} onLongPress={onLongPress}>
-          <Text style={styles.text}>&#xf024;</Text>
+          <Text style={styles.flag}>&#xf024;</Text>
         </TouchableHighlight>
       </View>
     );

@@ -8,10 +8,12 @@
 
 import React from 'react';
 import {
-  StyleSheet, Text, View,
+  StyleSheet, Text, View, TouchableHighlight,
 } from 'react-native';
 import FontAwesome, { Icons } from 'react-native-fontawesome';
+import ms from 'pretty-ms';
 import Board from './components/Board';
+import Timer from './components/Timer';
 
 const styles = StyleSheet.create({
   container: {
@@ -27,11 +29,17 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flex: 1,
+    flexDirection: 'row',
     backgroundColor: 'beige',
+  },
+  button: {
+    flex: 1,
+    backgroundColor: 'darkgray',
   },
   scoreboard: {
     flex: 1,
-    backgroundColor: 'brown',
+    flexDirection: 'row',
+    backgroundColor: 'slategray',
   },
   titleWords: {
     fontFamily: 'FontAwesome',
@@ -39,6 +47,25 @@ const styles = StyleSheet.create({
     margin: 10,
     textAlign: 'center',
     color: 'silver',
+  },
+  timer: {
+    fontFamily: 'FontAwesome',
+    fontSize: 45,
+    margin: 10,
+    textAlign: 'center',
+    justifyContent: 'center',
+    color: 'silver',
+  },
+  timerTitle: {
+    flex: 2,
+    backgroundColor: 'slategray',
+  },
+  bombs: {
+    fontFamily: 'FontAwesome',
+    fontSize: 45,
+    margin: 10,
+    textAlign: 'center',
+    color: 'slategray',
   },
 });
 
@@ -61,10 +88,14 @@ export default class App extends React.Component {
       board: Array.from({ length: 100 }, () => 1),
       mines: 10,
       size: 10,
-      remaining: 100,
+      time: 0,
+      isOn: false,
     };
     this.check = this.check.bind(this);
+    this.getBoard = this.getBoard.bind(this);
     this.toggleFlag = this.toggleFlag.bind(this);
+    this.resetTimer = this.resetTimer.bind(this);
+    this.stopTimer = this.stopTimer.bind(this);
   }
 
   componentDidMount() {
@@ -100,7 +131,10 @@ export default class App extends React.Component {
   }
 
   check(row, col) {
-    const { board, size } = this.state;
+    const { board, size, isOn } = this.state;
+    if (!isOn) {
+      this.startTimer();
+    }
     let newValue = board[(row * size) + col];
     if (newValue === -9) {
       newValue -= 2;
@@ -113,14 +147,16 @@ export default class App extends React.Component {
       checkHelper(newBoard, row, col);
     }
     const rem = newBoard.reduce((res, el) => (el > 0 ? res + 1 : res), 0);
-    this.setState({ board: newBoard, remaining: rem });
+    this.setState({ board: newBoard });
     if (rem === 0) {
       this.reveal();
+      this.stopTimer();
+      this.resetTimer();
     }
   }
 
   toggleFlag(row, col) {
-    const { board, size, remaining } = this.state;
+    const { board, size } = this.state;
     let value = board[(row * size) + col];
     if (value > 9) {
       value -= 9;
@@ -132,7 +168,6 @@ export default class App extends React.Component {
     const newBoard = Array.from(board);
     newBoard[(row * size) + col] = value;
     this.setState({ board: newBoard });
-    console.warn(remaining);
   }
 
   reveal() {
@@ -141,31 +176,72 @@ export default class App extends React.Component {
     for (let i = 0; i < newBoard.length; i++) {
       if (newBoard[i] === -9 || newBoard[i] === -10) {
         newBoard[i] = -12;
+      } else if (newBoard[i] > 0 && newBoard[i] < 9) {
+        newBoard[i] -= 9;
       }
     }
+    this.stopTimer();
     this.setState({ board: newBoard });
   }
 
+  startTimer() {
+    const now = Date.now();
+    this.setState({ isOn: true })
+    this.timer = setInterval(() => this.setState({
+      time: Date.now() - now,
+    }), 1000);
+  }
+
+  stopTimer() {
+    const { time } = this.state;
+    clearInterval(this.timer);
+    this.setState({ isOn: false, time });
+  }
+
+  resetTimer() {
+    this.setState({ time: 0 });
+  }
+
+  resetGame() {
+    this.stopTimer();
+    this.resetTimer();
+    this.resetBoard();
+  }
+
   render() {
-    const { board, remaining } = this.state;
-    console.warn(remaining);
+    const {
+      board, time,
+    } = this.state;
     return (
       <View style={styles.container}>
         <View style={styles.title}>
           <Text style={styles.titleWords}>MINE &#xf1e2; SWEEPER</Text>
         </View>
         <Board board={board} onPress={this.check} onLongPress={this.toggleFlag} />
-        <View style={styles.buttons} />
+        <View style={styles.buttons}>
+          <View style={styles.button}>
+            <Text style={styles.bombs}>&#xf1e2;</Text>
+          </View>
+          <View style={styles.timerTitle}>
+            <Text style={styles.timer}>{ms(time - (time % 1000))}</Text>
+          </View>
+          <View style={styles.button}>
+            <Text style={styles.bombs}>&#xf1e2;</Text>
+          </View>
+        </View>
         <View style={styles.scoreboard}>
-          <Text><FontAwesome>{Icons.bomb}</FontAwesome></Text>
+          <View style={styles.timerTitle}>
+            <TouchableHighlight onPress={() => this.resetGame()} style={{ flex: 1 }}>
+              <Text style={styles.timer}>RESET</Text>
+            </TouchableHighlight>
+          </View>
+          <View style={styles.timerTitle}>
+            <TouchableHighlight style={{ flex: 1 }}>
+              <Text style={styles.timer}>LOGOUT</Text>
+            </TouchableHighlight>
+          </View>
         </View>
       </View>
     );
   }
 }
-
-
-// <Text style={styles.welcome}>Welcome to React Native!</Text>
-//         <Text style={styles.instructions}>To get started, edit App.js</Text>
-//         <Text style={styles.instructions}>{instructions}</Text>
-//         <Text style={styles.instructions}>Test</Text>
